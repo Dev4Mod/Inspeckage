@@ -1,5 +1,8 @@
 package mobi.acpm.inspeckage.webserver;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -26,11 +29,26 @@ public class InspeckageService extends Service {
     private WebServer ws;
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // Let it continue running until it is stopped.
-        Context context = getApplicationContext();
-
         String host = null;
         int port = 8008;
+        // Let it continue running until it is stopped.
+        NotificationChannel channel = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            channel = new NotificationChannel(
+                    "1001",
+                    "Running",
+                    NotificationManager.IMPORTANCE_LOW
+            );
+            getSystemService(NotificationManager.class).createNotificationChannel(channel);
+            Notification.Builder notification = new Notification.Builder(this, "1001")
+                    .setContentText("Service is running on port: " + port)
+                    .setContentTitle("Service enabled");
+
+            startForeground(1001, notification.build());
+        }
+
+        Context context = getApplicationContext();
+
         if (intent != null && intent.getExtras() != null) {
             host = intent.getStringExtra("host");
             port = intent.getIntExtra("port", 8008);

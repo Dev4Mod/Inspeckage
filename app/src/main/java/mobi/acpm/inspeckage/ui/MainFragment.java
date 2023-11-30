@@ -244,7 +244,11 @@ public class MainFragment extends Fragment {
         i.putExtra("port", port);
         i.putExtra("host", host);
 
-        context.startService(i);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(i);
+        }else{
+            context.startService(i);
+        }
     }
 
     public void stopService() {
